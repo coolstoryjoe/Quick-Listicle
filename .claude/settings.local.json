@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(vercel env:*)",
+      "WebFetch(domain:quick-listicle.vercel.app)",
+      "Bash(cat:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:vercel.com)",
+      "Read(//c/Users/JoeOleynik/Coding Projects/**)",
+      "Bash(git commit:*)",
+      "Bash(vercel ls:*)",
+      "Bash(dir:*)",
+      "WebFetch(domain:quick-listicle-osvdtyx9g-coolstoryjoes-projects.vercel.app)",
+      "Bash(vercel inspect:*)",
+      "Bash(vercel logs:*)",
+      "Bash(vercel --prod)",
+      "WebFetch(domain:quick-listicle-gdqwpuu60-coolstoryjoes-projects.vercel.app)",
+      "Bash(npm install)",
+      "Bash(vercel alias set:*)",
+      "Bash(npm run build:*)",
+      "Bash(curl:*)",
+      "Bash(vercel domains:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

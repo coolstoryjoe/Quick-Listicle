@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Quick Listicle",
+  "version": "1.0.0",
+  "description": "Save the current website domain to your Quick Listicle collection",
+  "permissions": ["activeTab"],
+  "host_permissions": ["https://quick-listicle-su1eu9mi0-coolstoryjoes-projects.vercel.app/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Save to Quick Listicle"
+  }
+}
