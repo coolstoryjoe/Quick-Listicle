@@ -43,7 +43,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-8 py-32">
+      <div className="max-w-2xl mx-auto px-16 py-32">
         {/* Header */}
         <div className="text-center mb-40">
           <h1 className="text-5xl font-serif text-black mb-10 leading-tight max-w-3xl mx-auto" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif', fontWeight: 400, fontSize: '3.5rem', lineHeight: '1.2' }}>
