@@ -39,7 +39,7 @@ async function saveDomain(domain) {
   saveButton.textContent = 'Saving...';
 
   try {
-    const response = await fetch('https://quick-listicle-su1eu9mi0-coolstoryjoes-projects.vercel.app/api/sites', {
+    const response = await fetch('https://quick-listicle.vercel.app/api/sites', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
