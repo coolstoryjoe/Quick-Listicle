@@ -43,3 +43,4 @@ next-env.d.ts
 
 # old structure
 vercel-app/
+.env*.local

@@ -10,6 +10,8 @@ export default function Home() {
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [backendConnected, setBackendConnected] = useState(true);
+  const [backendMessage, setBackendMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSites();
@@ -19,6 +21,14 @@ export default function Home() {
     try {
       const response = await fetch('/api/sites');
       const data = await response.json();
+      
+      // Check backend connection status
+      setBackendConnected(data.backendConnected !== false);
+      
+      if (data.message) {
+        setBackendMessage(data.message);
+      }
+      
       if (response.ok) {
         setSites(data.sites.map((domain: string) => ({ domain })));
       } else {
@@ -26,6 +36,7 @@ export default function Home() {
       }
     } catch (err) {
       setError('Failed to load sites');
+      setBackendConnected(false);
     } finally {
       setLoading(false);
     }
@@ -50,15 +61,45 @@ export default function Home() {
             </div>
           )}
 
-          {error && (
-            <div className="text-center text-red-600">
+          {!backendConnected && !loading && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+              <div className="flex items-center justify-center mb-3">
+                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-yellow-900 mb-2">
+                Backend Not Connected
+              </h3>
+              <p className="text-yellow-800 mb-4">
+                {backendMessage || 'The backend database is not configured. Sites cannot be saved yet.'}
+              </p>
+              <div className="text-sm text-yellow-700 bg-yellow-100 rounded p-3 text-left">
+                <p className="font-semibold mb-1">To enable site saving:</p>
+                <ol className="list-decimal list-inside space-y-1">
+                  <li>Set up an Upstash Redis database</li>
+                  <li>Add environment variables in Vercel:
+                    <ul className="list-disc list-inside ml-4 mt-1">
+                      <li><code className="bg-yellow-200 px-1 rounded">KV_REST_API_URL</code></li>
+                      <li><code className="bg-yellow-200 px-1 rounded">KV_REST_API_TOKEN</code></li>
+                    </ul>
+                  </li>
+                  <li>Redeploy your application</li>
+                </ol>
+              </div>
+            </div>
+          )}
+
+          {error && backendConnected && (
+            <div className="text-center text-red-600 bg-red-50 border border-red-200 rounded-lg p-4">
               {error}
             </div>
           )}
 
-          {!loading && !error && sites.length === 0 && (
-            <div className="text-center text-gray-500">
-              No sites saved yet. Click the extension icon on any website to save it here.
+          {!loading && !error && backendConnected && sites.length === 0 && (
+            <div className="text-center text-gray-500 bg-gray-50 border border-gray-200 rounded-lg p-6">
+              <p className="mb-2">No sites saved yet.</p>
+              <p className="text-sm">Click the extension icon on any website to save it here.</p>
             </div>
           )}
 

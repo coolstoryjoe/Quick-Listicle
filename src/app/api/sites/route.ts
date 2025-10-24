@@ -3,31 +3,39 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const SITES_KEY = 'quick-listicle-sites';
 
-// Check for required environment variables
-if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-  console.error('Missing required environment variables: KV_REST_API_URL or KV_REST_API_TOKEN');
-}
+// Check if Redis is configured
+const isRedisConfigured = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 
-// Initialize Upstash Redis client
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!,
-});
+// Initialize Upstash Redis client only if configured
+let redis: Redis | null = null;
+if (isRedisConfigured) {
+  redis = new Redis({
+    url: process.env.KV_REST_API_URL!,
+    token: process.env.KV_REST_API_TOKEN!,
+  });
+}
 
 export async function GET() {
   try {
-    // Check if Redis is configured
-    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-      return NextResponse.json({
-        error: 'Redis not configured. Please set KV_REST_API_URL and KV_REST_API_TOKEN environment variables.'
-      }, { status: 500 });
+    // If Redis is not configured, return empty array with a flag
+    if (!isRedisConfigured || !redis) {
+      return NextResponse.json({ 
+        sites: [],
+        backendConnected: false,
+        message: 'Backend not configured. Add Redis environment variables to enable saving sites.'
+      });
     }
 
     const sites = await redis.smembers(SITES_KEY) || [];
-    return NextResponse.json({ sites });
+    return NextResponse.json({ 
+      sites,
+      backendConnected: true
+    });
   } catch (error) {
     console.error('Error fetching sites:', error);
     return NextResponse.json({
+      sites: [],
+      backendConnected: false,
       error: 'Failed to fetch sites',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
@@ -37,10 +45,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     // Check if Redis is configured
-    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+    if (!isRedisConfigured || !redis) {
       return NextResponse.json({
-        error: 'Redis not configured. Please set KV_REST_API_URL and KV_REST_API_TOKEN environment variables.'
-      }, { status: 500 });
+        error: 'Backend not configured. Redis environment variables are not set.',
+        backendConnected: false
+      }, { status: 503 });
     }
 
     const { domain } = await request.json();
@@ -62,13 +71,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       domain,
-      totalSites
+      totalSites,
+      backendConnected: true
     });
   } catch (error) {
     console.error('Error saving domain:', error);
     return NextResponse.json({
       error: 'Failed to save domain',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : 'Unknown error',
+      backendConnected: false
     }, { status: 500 });
   }
 }
